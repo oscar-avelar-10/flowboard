@@ -220,3 +220,19 @@ test("essential WCAG accessibility checks across all pages", async ({
     expect(violations, route).toEqual([]);
   }
 });
+
+test("charts draw real series and expose interactive details", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const area = page.locator(".recharts-area-area");
+  await expect(area).toBeVisible();
+  await expect(area).toHaveAttribute("d", /[LC]/);
+  await page.getByLabel("Revenue period").selectOption("3");
+  await expect(page.getByText("$73,900", { exact: true })).toBeVisible();
+  await page.goto("/reports");
+  await expect(page.locator(".recharts-bar-rectangle").first()).toBeVisible();
+  await expect(page.locator(".recharts-pie-sector").first()).toBeVisible();
+  await page.locator(".recharts-bar-rectangle").first().hover();
+  await expect(page.locator(".recharts-tooltip-wrapper").first()).toBeVisible();
+});

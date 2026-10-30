@@ -57,6 +57,7 @@ export function RevenueChart({ period = "6" }: { period?: string }) {
             contentStyle={{ borderRadius: 12, border: "1px solid #e6e9f1" }}
           />
           <Area
+            isAnimationActive={false}
             name="Revenue"
             type="monotone"
             dataKey="revenue"
@@ -101,12 +102,14 @@ export function TargetChart() {
             contentStyle={{ borderRadius: 12 }}
           />
           <Bar
+            isAnimationActive={false}
             dataKey="revenue"
             name="Revenue"
             fill="#6C5CE7"
             radius={[4, 4, 0, 0]}
           />
           <Bar
+            isAnimationActive={false}
             dataKey="target"
             name="Goal"
             fill="#ded9fd"
@@ -133,6 +136,7 @@ export function StatusChart({
         <ResponsiveContainer width="100%" height="100%">
           <PieChart accessibilityLayer>
             <Pie
+              isAnimationActive={false}
               data={data}
               dataKey="value"
               innerRadius="64%"
