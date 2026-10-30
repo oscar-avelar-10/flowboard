@@ -60,7 +60,7 @@ Accesibilidad: navegación semántica, salto al contenido, etiquetas de formular
 
 ## Desplegar en Vercel
 
-1. Crea un repositorio llamado `flowboard` con la visibilidad que prefieras y sube el código. No se ha creado automáticamente un repositorio remoto.
+1. Usa el repositorio público [AvelarLic96/flowboard](https://github.com/AvelarLic96/flowboard), que incluye el historial de desarrollo.
 2. En Vercel, selecciona **Add New → Project** e importa ese repositorio.
 3. Mantén el preset **Next.js**, raíz del repositorio, instalación `npm ci` y compilación `npm run build`.
 4. No agregues variables de entorno. Despliega.
