@@ -104,7 +104,7 @@ textarea {
 }
 input::placeholder,
 textarea::placeholder {
-  color: #7b8597;
+  color: #69758b;
 }
 select {
   font-size: 12px;
@@ -385,7 +385,7 @@ nav a.active:before {
   display: flex;
   align-items: center;
   gap: 9px;
-  color: #8a93a5;
+  color: #69758b;
   max-width: 270px;
   min-width: 160px;
   flex: 1;
@@ -405,7 +405,7 @@ nav a.active:before {
 .demo-pill {
   background: #f4f1ff;
   border: 1px solid #e8e1fc;
-  color: #7563c5;
+  color: #69758b;
   font-size: 9px;
   border-radius: 5px;
   padding: 4px 7px;
@@ -486,7 +486,7 @@ main {
 }
 .banner-separator {
   margin: 0 2px;
-  color: #a5aab6;
+  color: #69758b;
 }
 .page-title {
   display: flex;
@@ -496,7 +496,7 @@ main {
   margin-bottom: 28px;
 }
 .eyebrow {
-  color: #8b829f;
+  color: #69758b;
   font-size: 9px;
   letter-spacing: 1.65px;
   font-weight: 600;
@@ -640,7 +640,7 @@ main {
   align-items: center;
   gap: 5px;
   font-size: 9px;
-  color: #8b93a3;
+  color: #69758b;
   margin-top: 12px;
   min-height: 16px;
   flex-wrap: wrap;
@@ -667,7 +667,7 @@ main {
 }
 .section-heading p {
   font-size: 10px;
-  color: #8a93a5;
+  color: #69758b;
   margin-top: 4px;
 }
 .section-heading select {
@@ -701,13 +701,13 @@ main {
 .badge-active,
 .badge-completed,
 .badge-done {
-  color: #258567;
+  color: #1c7458;
   background: #e9f7ef;
 }
 .badge-lead,
 .badge-planning,
 .badge-medium {
-  color: #a07725;
+  color: #8a641b;
   background: #fff6e3;
 }
 .badge-inactive,
@@ -716,7 +716,7 @@ main {
   background: #f0f2f6;
 }
 .badge-in-progress {
-  color: #467ec3;
+  color: #3265a4;
   background: #edf4ff;
 }
 .badge-review,
@@ -756,7 +756,7 @@ main {
 }
 .chart-caption span {
   margin-left: auto;
-  color: #9299a8;
+  color: #69758b;
 }
 .activity-list {
   padding: 4px 23px 10px;
@@ -787,7 +787,7 @@ main {
 }
 .activity-list small {
   font-size: 9px;
-  color: #939aaa;
+  color: #69758b;
   display: block;
   margin-top: 3px;
 }
@@ -837,7 +837,7 @@ main {
   font-size: 10px;
   padding: 1px 7px;
   border-radius: 5px;
-  color: #8992a4;
+  color: #69758b;
   background: #f3f4f8;
 }
 table {
@@ -850,7 +850,7 @@ th {
   background: #fbfcfe;
   border-top: 1px solid #f0f2f7;
   border-bottom: 1px solid #f0f2f7;
-  color: #8992a5;
+  color: #69758b;
   font-weight: 500;
   font-size: 9px;
   padding: 12px 16px;
@@ -875,6 +875,7 @@ tbody tr:hover {
   background: #fdfcff;
 }
 .table-scroll {
+  position: relative;
   overflow-x: auto;
   border-radius: 0 0 16px 16px;
 }
@@ -929,7 +930,7 @@ tbody tr:hover {
   place-items: center;
   background: #e7e0ff;
   border: 1px solid #dad0ff;
-  color: #8a74d7;
+  color: #69758b;
   width: 38px;
   height: 38px;
   font-size: 29px;
@@ -943,14 +944,14 @@ tbody tr:hover {
 }
 .insight-strip p {
   font-size: 10px;
-  color: #988cab;
+  color: #69758b;
   margin-top: 3px;
 }
 .insight-strip .btn {
   margin-left: auto;
   font-size: 10px;
   background: #ffffff96;
-  color: #7c66b7;
+  color: #69758b;
   border-color: #e0d9f3;
 }
 footer {
@@ -960,7 +961,7 @@ footer {
   align-items: center;
   justify-content: space-between;
   gap: 15px;
-  color: #9ba3b2;
+  color: #69758b;
   font-size: 9px;
   border-top: 1px solid #e9ecf3;
 }
@@ -976,7 +977,7 @@ footer button {
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #9299aa;
+  color: #69758b;
   font-size: 9px;
 }
 .toolbar {
@@ -999,7 +1000,7 @@ footer button {
   border-radius: 8px;
   background: white;
   padding: 0 12px;
-  color: #939bad;
+  color: #69758b;
   max-width: 430px;
   flex: 1;
   min-width: 0;
@@ -1021,7 +1022,7 @@ footer button {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #9098a8;
+  color: #69758b;
 }
 .filter-control select {
   min-width: 128px;
@@ -1038,7 +1039,7 @@ footer button {
   display: flex;
   justify-content: space-between;
   border-top: 1px solid var(--border);
-  color: #8b93a5;
+  color: #69758b;
 }
 .table-footer span {
   font-size: 9px;
@@ -1066,7 +1067,7 @@ footer button {
   gap: 25px;
   margin-bottom: 25px;
   font-size: 11px;
-  color: #7b8597;
+  color: #69758b;
   flex-wrap: wrap;
 }
 .project-summary > span {
@@ -1130,7 +1131,7 @@ footer button {
 }
 .project-client {
   font-size: 10px;
-  color: #8a93a5;
+  color: #69758b;
 }
 .project-card h2 {
   margin-top: 5px;
@@ -1143,7 +1144,7 @@ footer button {
 }
 .project-description {
   font-size: 11px;
-  color: #8a93a5;
+  color: #69758b;
   line-height: 1.8;
   margin-top: 9px;
   min-height: 40px;
@@ -1156,7 +1157,7 @@ footer button {
 .progress-label {
   display: flex;
   justify-content: space-between;
-  color: #8992a5;
+  color: #69758b;
   font-size: 10px;
   margin: 20px 0 8px;
 }
@@ -1169,7 +1170,7 @@ footer button {
   justify-content: space-between;
   margin-top: 16px;
   font-size: 9px;
-  color: #9199aa;
+  color: #69758b;
   gap: 8px;
 }
 .project-meta span {
@@ -1190,7 +1191,7 @@ footer button {
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #8c94a4;
+  color: #69758b;
   font-size: 9px;
 }
 .project-card-footer > strong {
@@ -1237,7 +1238,7 @@ footer button {
   display: flex;
   gap: 10px;
   font-size: 9px;
-  color: #8b93a3;
+  color: #69758b;
 }
 .inline-legend span {
   display: flex;
@@ -1274,7 +1275,7 @@ footer button {
   font-weight: 600;
 }
 .donut-total small {
-  color: #9199ab;
+  color: #69758b;
   font-size: 10px;
 }
 .chart-legend {
@@ -1288,7 +1289,7 @@ footer button {
   align-items: center;
   gap: 6px;
   font-size: 10px;
-  color: #8a93a5;
+  color: #69758b;
 }
 .chart-legend i {
   width: 7px;
@@ -1321,7 +1322,7 @@ footer button {
 }
 .rank-number {
   font-size: 10px;
-  color: #a2a9b8;
+  color: #69758b;
 }
 .rank-details {
   flex: 1;
@@ -1349,7 +1350,7 @@ footer button {
 }
 .delivery-card > p {
   font-size: 10px;
-  color: #939bad;
+  color: #69758b;
   margin-top: 5px;
   margin-bottom: 20px;
 }
@@ -1368,17 +1369,17 @@ footer button {
 .delivery-card > small {
   display: block;
   font-size: 9px;
-  color: #9098aa;
+  color: #69758b;
   margin-top: 16px;
   line-height: 1.7;
 }
 .board-total {
   margin-left: auto;
   font-size: 11px;
-  color: #8a93a5;
+  color: #69758b;
 }
 .board-help {
-  color: #8a93a5;
+  color: #69758b;
   font-size: 10px;
   margin: -6px 0 18px;
 }
@@ -1462,7 +1463,7 @@ footer button {
   top: 11px;
   right: 6px;
   padding: 4px;
-  color: #a7afbd;
+  color: #69758b;
   touch-action: none;
   cursor: grab;
 }
@@ -1500,7 +1501,7 @@ footer button {
 .tag {
   font-size: 8px;
   background: #f5f6fa;
-  color: #9199a9;
+  color: #69758b;
   border-radius: 4px;
   padding: 4px 6px;
 }
@@ -1514,7 +1515,7 @@ footer button {
   border-top: 1px solid #f1f3f7;
   padding-top: 10px;
   font-size: 8px;
-  color: #929aab;
+  color: #69758b;
   flex-wrap: wrap;
 }
 .assignee-name {
@@ -1536,7 +1537,7 @@ footer button {
   min-height: 26px;
   width: 100%;
   border-color: #edf0f5;
-  color: #8992a5;
+  color: #69758b;
   margin-top: 9px;
   padding: 3px 6px;
 }
@@ -1546,7 +1547,7 @@ footer button {
   align-items: center;
   flex-direction: column;
   gap: 6px;
-  color: #a0a8b8;
+  color: #69758b;
   text-align: center;
 }
 .column-empty p {
@@ -1561,7 +1562,7 @@ footer button {
   justify-content: center;
   gap: 6px;
   padding: 14px 0 2px;
-  color: #8a93a6;
+  color: #69758b;
   font-size: 10px;
   width: 100%;
 }
@@ -1606,7 +1607,7 @@ footer button {
 }
 .dialog-heading p {
   font-size: 11px;
-  color: #8a93a5;
+  color: #69758b;
   margin-top: 5px;
   max-width: 400px;
 }
@@ -1621,7 +1622,7 @@ footer button {
   gap: 6px;
   min-width: 0;
 }
-.field > span {
+.field > label {
   font-size: 11px;
   font-weight: 600;
   color: #677188;
@@ -1910,11 +1911,13 @@ footer button {
 }
 @media (max-width: 760px) {
   .sidebar {
+    visibility: hidden;
     transform: translateX(-100%);
     width: 244px;
     transition: transform 0.2s;
   }
   .sidebar.is-open {
+    visibility: visible;
     transform: translateX(0);
   }
   .mobile-scrim {

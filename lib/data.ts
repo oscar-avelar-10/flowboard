@@ -1,28 +1,54 @@
 import { z } from "zod";
 export const clientSchema = z.object({
   name: z.string().trim().min(2, "Enter at least 2 characters").max(60),
-  company: z.string().trim().min(2).max(80),
+  company: z
+    .string()
+    .trim()
+    .min(2, "Enter a company name with at least 2 characters")
+    .max(80, "Use 80 characters or fewer"),
   email: z.email("Enter a valid email address"),
   status: z.enum(["Active", "Lead", "Inactive"]),
 });
 export const projectSchema = z.object({
-  name: z.string().trim().min(3).max(80),
-  description: z.string().trim().min(10).max(240),
+  name: z
+    .string()
+    .trim()
+    .min(3, "Enter a project name with at least 3 characters")
+    .max(80, "Use 80 characters or fewer"),
+  description: z
+    .string()
+    .trim()
+    .min(10, "Describe the project in at least 10 characters")
+    .max(240, "Use 240 characters or fewer"),
   clientId: z.string().min(1, "Select a client"),
-  budget: z.number().min(0).max(10000000),
+  budget: z
+    .number({ error: "Enter a valid budget" })
+    .min(0, "Budget must be zero or more")
+    .max(10000000, "Maximum demo budget is $10,000,000"),
   priority: z.enum(["Low", "Medium", "High"]),
   status: z.enum(["Planning", "In progress", "Review", "Completed"]),
-  progress: z.number().min(0).max(100),
-  due: z.iso.date(),
+  progress: z
+    .number({ error: "Enter progress from 0 to 100" })
+    .min(0, "Progress must be 0–100%")
+    .max(100, "Progress must be 0–100%"),
+  due: z.iso.date("Choose a valid due date"),
 });
 export const columns = ["Backlog", "In progress", "In review", "Done"] as const;
 export const taskSchema = z.object({
-  title: z.string().trim().min(3).max(100),
+  title: z
+    .string()
+    .trim()
+    .min(3, "Enter a task title with at least 3 characters")
+    .max(100, "Use 100 characters or fewer"),
   projectId: z.string().min(1, "Select a project"),
   priority: z.enum(["Low", "Medium", "High"]),
   status: z.enum(columns),
-  assignee: z.string().trim().min(2).max(50),
-  due: z.iso.date(),
+  assignee: z
+    .string()
+    .trim()
+    .min(2, "Enter an assignee name")
+    .max(50, "Use 50 characters or fewer"),
+  due: z.iso.date("Choose a valid due date"),
   tags: z.string().trim().max(80),
 });
 export type Client = z.infer<typeof clientSchema> & { id: string };

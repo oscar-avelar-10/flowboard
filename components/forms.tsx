@@ -45,8 +45,8 @@ function Field({
     ...register(name as keyof Values, { valueAsNumber: type === "number" }),
   };
   return (
-    <label className="field" htmlFor={id}>
-      <span>{label}</span>
+    <div className="field">
+      <label htmlFor={id}>{label}</label>
       {options ? (
         <select {...attrs}>
           {options.map((o) => (
@@ -69,7 +69,7 @@ function Field({
           {error}
         </small>
       )}
-    </label>
+    </div>
   );
 }
 const opts = (values: readonly string[]) =>

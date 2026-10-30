@@ -1,5 +1,5 @@
 "use client";
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -34,6 +34,41 @@ function Shell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { state, ready, warning, notice, notify, reset } = useStore();
   const [mobile, setMobile] = useState(false);
+  const navigationRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!mobile) return;
+    const menuButton = menuButtonRef.current;
+    const focusable = () =>
+      Array.from(
+        navigationRef.current?.querySelectorAll<HTMLElement>(
+          "a[href], button:not([disabled])",
+        ) ?? [],
+      );
+    focusable()[0]?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobile(false);
+      if (event.key !== "Tab") return;
+      const elements = focusable();
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = previousOverflow;
+      menuButton?.focus();
+    };
+  }, [mobile]);
   const [panel, setPanel] = useState<
     "notifications" | "profile" | "reset" | null
   >(null);
@@ -81,7 +116,11 @@ function Shell({ children }: { children: ReactNode }) {
           onClick={() => setMobile(false)}
         />
       )}
-      <aside className={`sidebar ${mobile ? "is-open" : ""}`}>
+      <aside
+        id="workspace-navigation"
+        ref={navigationRef}
+        className={`sidebar ${mobile ? "is-open" : ""}`}
+      >
         <Link href="/" className="brand" onClick={() => setMobile(false)}>
           <span className="brand-mark">
             <i />
@@ -148,6 +187,9 @@ function Shell({ children }: { children: ReactNode }) {
             variant="ghost"
             size="icon"
             className="mobile-toggle"
+            ref={menuButtonRef}
+            aria-expanded={mobile}
+            aria-controls="workspace-navigation"
             aria-label="Open navigation"
             onClick={() => setMobile(true)}
           >
