@@ -1,21 +1,893 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { Plus,ArrowUpRight,ArrowRight,Users,FolderKanban,CheckCheck,DollarSign,Search,LayoutGrid,List,MoreHorizontal,CalendarDays,Trash2,SlidersHorizontal,CheckCircle2,Target,Clock3 } from "lucide-react";
+import {
+  Plus,
+  ArrowUpRight,
+  ArrowRight,
+  Users,
+  FolderKanban,
+  CheckCheck,
+  DollarSign,
+  Search,
+  LayoutGrid,
+  List,
+  MoreHorizontal,
+  CalendarDays,
+  Trash2,
+  SlidersHorizontal,
+  CheckCircle2,
+  Target,
+  Clock3,
+} from "lucide-react";
 import { useStore } from "./store";
 import { Button } from "./ui/button";
 import { Dialog } from "./ui/dialog";
 import { EntityForm } from "./forms";
-import { RevenueChart,TargetChart,StatusChart } from "./charts";
-import { money,initials,dateLabel,revenue,type Project,type Client } from "@/lib/data";
-export function Badge({value}:{value:string}){return <span className={`badge badge-${value.toLowerCase().replaceAll(" ","-")}`}>{value==="High"&&<span className="priority-dot"/>}{value}</span>;}
-export function PageTitle({eyebrow,title,description,children}:{eyebrow:string;title:string;description:string;children?:React.ReactNode}){return <div className="page-title"><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{description}</p></div><div className="page-actions">{children}</div></div>;}
-function Empty({title,description,action}:{title:string;description:string;action?:React.ReactNode}){return <div className="empty"><FolderKanban size={28}/><h3>{title}</h3><p>{description}</p>{action}</div>;}
-function Metric({label,value,note,icon:Icon,tone="purple",trend}:{label:string;value:string;note:string;icon:typeof Users;tone?:string;trend?:string}){return <div className="metric card"><div className="metric-top"><span>{label}</span><span className={`metric-icon ${tone}`}><Icon size={19}/></span></div><strong className="metric-value">{value}</strong><div className="metric-note">{trend&&<span className="trend"><ArrowUpRight size={13}/>{trend}</span>}<span>{note}</span></div></div>;}
-function Progress({value}:{value:number}){return <div className="progress" role="progressbar" aria-label="Project progress" aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}><span style={{width:`${value}%`}}/></div>;}
-function ProjectTable({projects,onEdit}:{projects:Project[];onEdit:(p:Project)=>void}){const {state}=useStore();return projects.length?<div className="table-scroll"><table><thead><tr><th>Project name</th><th>Client</th><th>Status</th><th>Progress</th><th>Due date</th><th>Budget</th><th><span className="sr-only">Actions</span></th></tr></thead><tbody>{projects.map(p=><tr key={p.id}><td><div className="project-name"><span className={`project-symbol ${p.color}`}><FolderKanban size={18}/></span><strong>{p.name}</strong></div></td><td>{state.clients.find(c=>c.id===p.clientId)?.company??"Unassigned"}</td><td><Badge value={p.status}/></td><td><div className="table-progress"><Progress value={p.progress}/><span>{p.progress}%</span></div></td><td className="nowrap">{dateLabel(p.due)}</td><td>{money(p.budget)}</td><td><Button variant="ghost" size="icon" aria-label={`Edit ${p.name}`} onClick={()=>onEdit(p)}><MoreHorizontal size={18}/></Button></td></tr>)}</tbody></table></div>:<Empty title="No active projects" description="Create a project to bring your workspace to life."/>;}
-export function Overview(){const {state}=useStore();const [form,setForm]=useState(false);const [edit,setEdit]=useState<Project>();const [period,setPeriod]=useState("6");const active=state.projects.filter(p=>p.status!=="Completed");const done=state.tasks.filter(t=>t.status==="Done").length;return <><PageTitle eyebrow="YOUR WORK, IN FOCUS" title="Good morning, Alex 👋" description="Here’s what’s happening in your workspace today."><span className="date-display"><CalendarDays size={16}/>{new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</span><Button onClick={()=>setForm(true)}><Plus size={17}/> New project</Button></PageTitle><div className="metrics-grid"><Metric label="Monthly revenue" value="$28,600" note="vs. previous demo month" icon={DollarSign} trend="33.0%"/><Metric label="Active clients" value={String(state.clients.filter(c=>c.status==="Active").length).padStart(2,"0")} note={`${state.clients.length} clients in your workspace`} icon={Users} tone="blue"/><Metric label="Active projects" value={String(active.length).padStart(2,"0")} note={`${state.projects.filter(p=>p.status==="Review").length} ready for review`} icon={FolderKanban} tone="amber"/><Metric label="Tasks completed" value={String(done).padStart(2,"0")} note={`out of ${state.tasks.length} total tasks`} icon={CheckCheck} tone="green"/></div><div className="overview-middle"><section className="card revenue-card"><div className="section-heading"><div><h2>Revenue overview</h2><p>A little perspective on your progress.</p></div><select aria-label="Revenue period" value={period} onChange={e=>setPeriod(e.target.value)}><option value="6">Last 6 months</option><option value="3">Last 3 months</option></select></div><div className="revenue-summary"><strong>{money(revenue.slice(-Number(period)).reduce((s,r)=>s+r.revenue,0))}</strong><span className="badge badge-active">Fictional revenue</span></div><RevenueChart period={period}/><div className="chart-caption"><i/> Revenue <span>USD · illustrative data</span></div></section><section className="card activity-card"><div className="section-heading"><div><h2>Recent activity</h2><p>The latest across your workspace.</p></div><span className="subtle-icon"><Clock3 size={18}/></span></div><div className="activity-list">{state.activity.slice(0,4).map((a,i)=><div key={a.id}><span className={`activity-icon ${["purple","blue","green","amber"][i]}`}>{i%2?<Users size={15}/>:<CheckCircle2 size={15}/>}</span><div><strong>{a.text}</strong><small>{new Date(a.time).toLocaleDateString("en-US",{month:"short",day:"numeric"})} · Demo activity</small></div></div>)}</div><Link href="/board" className="text-link">Go to task board <ArrowRight size={15}/></Link></section></div><section className="card"><div className="section-heading"><div className="heading-inline"><h2>Active projects</h2><span className="count-pill">{active.length}</span></div><Link href="/projects" className="text-link">View all projects <ArrowUpRight size={16}/></Link></div><ProjectTable projects={active.slice(0,4)} onEdit={setEdit}/></section><div className="insight-strip"><span className="insight-icon"><Sparkle/></span><div><strong>Space for your next big idea.</strong><p>Good work starts with a little clarity. Your workspace is ready.</p></div><Button variant="outline" onClick={()=>setForm(true)}>Start a project <ArrowUpRight size={16}/></Button></div>{(form||edit)&&<EntityForm kind="project" project={edit} onClose={()=>{setForm(false);setEdit(undefined);}}/>}</>;}
-function Sparkle(){return <span aria-hidden="true">✧</span>;}
-export function Clients(){const {state,deleteClient}=useStore();const [query,setQuery]=useState("");const [status,setStatus]=useState("All statuses");const [form,setForm]=useState(false);const [remove,setRemove]=useState<Client>();const clients=state.clients.filter(c=>(c.name+" "+c.company+" "+c.email).toLowerCase().includes(query.toLowerCase())&&(status==="All statuses"||c.status===status));return <><PageTitle eyebrow="RELATIONSHIPS THAT MATTER" title="Your clients" description="A thoughtful home for every client connection."><Button onClick={()=>setForm(true)}><Plus size={17}/> Add client</Button></PageTitle><div className="metrics-grid three"><Metric label="All clients" value={String(state.clients.length)} note="Fictional relationships" icon={Users}/><Metric label="Active clients" value={String(state.clients.filter(c=>c.status==="Active").length)} note="Let’s keep good work moving" icon={CheckCircle2} tone="green"/><Metric label="New opportunities" value={String(state.clients.filter(c=>c.status==="Lead").length)} note="Leads in your workspace" icon={Target} tone="amber"/></div><section className="card"><div className="toolbar"><div className="local-search"><Search size={17}/><input aria-label="Search clients" placeholder="Search clients by name, company or email…" value={query} onChange={e=>setQuery(e.target.value)}/></div><div className="filter-control"><SlidersHorizontal size={16}/><select aria-label="Filter client status" value={status} onChange={e=>setStatus(e.target.value)}>{["All statuses","Active","Lead","Inactive"].map(s=><option key={s}>{s}</option>)}</select></div></div>{clients.length?<div className="table-scroll"><table><thead><tr><th>Client</th><th>Company</th><th>Email</th><th>Status</th><th>Projects</th><th><span className="sr-only">Actions</span></th></tr></thead><tbody>{clients.map((c,i)=><tr key={c.id}><td><div className="client-name"><span className={`avatar ${["purple","blue","green","amber"][i%4]}`}>{initials(c.name)}</span><strong>{c.name}</strong></div></td><td>{c.company}</td><td><span className="muted">{c.email}</span></td><td><Badge value={c.status}/></td><td>{state.projects.filter(p=>p.clientId===c.id).length}</td><td><Button variant="ghost" size="icon" aria-label={`Delete ${c.company}`} onClick={()=>setRemove(c)}><Trash2 size={16}/></Button></td></tr>)}</tbody></table></div>:<Empty title="No clients found" description="Try another search or add your first fictional client." action={<Button onClick={()=>setForm(true)}>Add client</Button>}/>}<div className="table-footer">Showing {clients.length} of {state.clients.length} fictional clients<span>Saved in this browser</span></div></section>{form&&<EntityForm kind="client" onClose={()=>setForm(false)}/>} {remove&&<Dialog open onOpenChange={o=>{if(!o)setRemove(undefined);}} title={`Delete ${remove.company}?`} description={state.projects.some(p=>p.clientId===remove.id)?"This client has linked projects. Edit those projects and reassign their client before deleting this client.":"This removes the fictional client from your local workspace. This action cannot be undone."}><div className="form-actions"><Button variant="outline" onClick={()=>setRemove(undefined)}>Cancel</Button><Button variant="destructive" disabled={state.projects.some(p=>p.clientId===remove.id)} onClick={()=>{deleteClient(remove.id);setRemove(undefined);}}>Delete client</Button></div></Dialog>}</>;}
-export function Projects(){const {state}=useStore();const [view,setView]=useState("grid");const [query,setQuery]=useState("");const [status,setStatus]=useState("All statuses");const [form,setForm]=useState(false);const [edit,setEdit]=useState<Project>();const projects=state.projects.filter(p=>p.name.toLowerCase().includes(query.toLowerCase())&&(status==="All statuses"||p.status===status));return <><PageTitle eyebrow="IDEAS INTO MOMENTUM" title="Your projects" description="From the first spark to the final detail. Keep it all in view."><Button onClick={()=>setForm(true)}><Plus size={17}/> New project</Button></PageTitle><div className="project-summary"><span><i className="dot purple-bg"/>{state.projects.length} total projects</span><span><i className="dot blue-bg"/>{state.projects.filter(p=>p.status==="In progress").length} in progress</span><span><i className="dot green-bg"/>{state.projects.filter(p=>p.status==="Completed").length} completed</span><span className="summary-budget">{money(state.projects.reduce((s,p)=>s+p.budget,0))} total budget</span></div><div className="toolbar standalone"><div className="local-search"><Search size={17}/><input aria-label="Search projects" placeholder="Search projects…" value={query} onChange={e=>setQuery(e.target.value)}/></div><select aria-label="Filter project status" value={status} onChange={e=>setStatus(e.target.value)}>{["All statuses","Planning","In progress","Review","Completed"].map(s=><option key={s}>{s}</option>)}</select><div className="view-switch" aria-label="Project view"><Button variant="ghost" size="icon" aria-label="Card view" aria-pressed={view==="grid"} onClick={()=>setView("grid")}><LayoutGrid size={18}/></Button><Button variant="ghost" size="icon" aria-label="List view" aria-pressed={view==="list"} onClick={()=>setView("list")}><List size={18}/></Button></div></div>{!projects.length?<div className="card"><Empty title="No projects here yet" description="Try a different filter or create a new project." action={<Button onClick={()=>setForm(true)}>New project</Button>}/></div>:view==="list"?<section className="card"><ProjectTable projects={projects} onEdit={setEdit}/></section>:<div className="projects-grid">{projects.map(p=><article className="card project-card" key={p.id}><div className="project-card-top"><span className={`project-symbol ${p.color}`}><FolderKanban size={22}/></span><Button variant="ghost" size="icon" aria-label={`Edit ${p.name}`} onClick={()=>setEdit(p)}><MoreHorizontal size={20}/></Button></div><span className="project-client">{state.clients.find(c=>c.id===p.clientId)?.company}</span><h2><button className="title-button" onClick={()=>setEdit(p)}>{p.name}</button></h2><p className="project-description">{p.description}</p><div className="badge-row"><Badge value={p.status}/><Badge value={p.priority}/></div><div className="progress-label"><span>Progress</span><strong>{p.progress}%</strong></div><Progress value={p.progress}/><div className="project-meta"><span><CalendarDays size={14}/>{dateLabel(p.due)}</span><span><CheckCheck size={14}/>{state.tasks.filter(t=>t.projectId===p.id).length} tasks</span></div><div className="project-card-footer"><span><span className="avatar mini">AM</span> Alex Morgan</span><strong>{money(p.budget)}</strong></div></article>)}</div>}{(form||edit)&&<EntityForm kind="project" project={edit} onClose={()=>{setForm(false);setEdit(undefined);}}/>}</>;}
-export function Reports(){const {state}=useStore();const data=["Planning","In progress","Review","Completed"].map(name=>({name,value:state.projects.filter(p=>p.status===name).length}));const total=state.projects.reduce((s,p)=>s+p.budget,0);const done=state.projects.filter(p=>p.status==="Completed").length;const overdue=state.projects.filter(p=>p.status!=="Completed"&&p.due<new Date().toISOString().slice(0,10)).length;const ranked=state.clients.map(c=>({...c,value:state.projects.filter(p=>p.clientId===c.id).reduce((s,p)=>s+p.budget,0)})).sort((a,b)=>b.value-a.value).slice(0,5);return <><PageTitle eyebrow="THE BIGGER PICTURE" title="Workspace reports" description="Turn a little perspective into your next good decision."><span className="report-period"><CalendarDays size={16}/> May – October 2026</span></PageTitle><div className="report-note"><span>✧</span><p>Illustrative insights only. Revenue and goals are fixed fictional samples; project and client metrics update with your workspace.</p></div><div className="metrics-grid"><Metric label="Fictional revenue" value={money(revenue.reduce((s,r)=>s+r.revenue,0))} note="May – October 2026 sample" icon={DollarSign}/><Metric label="Monthly goal reached" value="110%" note="$28,600 of $26,000 · October" icon={Target} tone="green"/><Metric label="Project completion" value={`${state.projects.length?Math.round(done/state.projects.length*100):0}%`} note={`${done} of ${state.projects.length} projects completed`} icon={CheckCheck} tone="blue"/><Metric label="Overdue projects" value={String(overdue)} note="Open projects past their due date" icon={Clock3} tone="amber"/></div><div className="reports-grid"><section className="card"><div className="section-heading"><div><h2>Revenue vs. goals</h2><p>Six months of fictional momentum.</p></div><div className="inline-legend"><span><i className="purple-bg"/>Revenue</span><span><i className="light-purple-bg"/>Goal</span></div></div><TargetChart/></section><section className="card"><div className="section-heading"><div><h2>Project health</h2><p>A live snapshot of your workspace.</p></div></div>{state.projects.length?<StatusChart data={data}/>:<Empty title="No project data" description="Create a project to see its status here."/>}</section></div><div className="reports-bottom"><section className="card"><div className="section-heading"><div><h2>Top fictional clients</h2><p>Ranked by the total budget of linked projects.</p></div><span className="subtle-icon"><Users size={18}/></span></div>{ranked.length?<div className="ranking">{ranked.map((c,i)=><div key={c.id}><span className="rank-number">0{i+1}</span><span className={`avatar ${["purple","blue","green","amber"][i%4]}`}>{initials(c.company)}</span><div className="rank-details"><strong>{c.company}</strong><div className="progress"><span style={{width:`${ranked[0].value?c.value/ranked[0].value*100:0}%`}}/></div></div><strong>{money(c.value)}</strong></div>)}</div>:<Empty title="No clients yet" description="Add a fictional client to see their project value here."/>}</section><section className="card delivery-card"><span className="metric-icon green"><CheckCircle2 size={22}/></span><h2>Delivery at a glance</h2><p>Clear expectations. Thoughtful follow-through.</p><div><span>Completed projects</span><strong>{done}</strong></div><div><span>Open & within deadline</span><strong>{state.projects.length-done-overdue}</strong></div><div><span>Past due date</span><strong>{overdue}</strong></div><div><span>Workspace project budgets</span><strong>{money(total)}</strong></div><small>Dates are compared with today. Completion dates are not tracked; this is a current deadline snapshot.</small></section></div></>;}
+import { RevenueChart, TargetChart, StatusChart } from "./charts";
+import {
+  money,
+  initials,
+  dateLabel,
+  revenue,
+  type Project,
+  type Client,
+} from "@/lib/data";
+export function Badge({ value }: { value: string }) {
+  return (
+    <span className={`badge badge-${value.toLowerCase().replaceAll(" ", "-")}`}>
+      {value === "High" && <span className="priority-dot" />}
+      {value}
+    </span>
+  );
+}
+export function PageTitle({
+  eyebrow,
+  title,
+  description,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="page-title">
+      <div>
+        <div className="eyebrow">{eyebrow}</div>
+        <h1>{title}</h1>
+        <p>{description}</p>
+      </div>
+      <div className="page-actions">{children}</div>
+    </div>
+  );
+}
+function Empty({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="empty">
+      <FolderKanban size={28} />
+      <h3>{title}</h3>
+      <p>{description}</p>
+      {action}
+    </div>
+  );
+}
+function Metric({
+  label,
+  value,
+  note,
+  icon: Icon,
+  tone = "purple",
+  trend,
+}: {
+  label: string;
+  value: string;
+  note: string;
+  icon: typeof Users;
+  tone?: string;
+  trend?: string;
+}) {
+  return (
+    <div className="metric card">
+      <div className="metric-top">
+        <span>{label}</span>
+        <span className={`metric-icon ${tone}`}>
+          <Icon size={19} />
+        </span>
+      </div>
+      <strong className="metric-value">{value}</strong>
+      <div className="metric-note">
+        {trend && (
+          <span className="trend">
+            <ArrowUpRight size={13} />
+            {trend}
+          </span>
+        )}
+        <span>{note}</span>
+      </div>
+    </div>
+  );
+}
+function Progress({ value }: { value: number }) {
+  return (
+    <div
+      className="progress"
+      role="progressbar"
+      aria-label="Project progress"
+      aria-valuenow={value}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
+      <span style={{ width: `${value}%` }} />
+    </div>
+  );
+}
+function ProjectTable({
+  projects,
+  onEdit,
+}: {
+  projects: Project[];
+  onEdit: (p: Project) => void;
+}) {
+  const { state } = useStore();
+  return projects.length ? (
+    <div className="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Project name</th>
+            <th>Client</th>
+            <th>Status</th>
+            <th>Progress</th>
+            <th>Due date</th>
+            <th>Budget</th>
+            <th>
+              <span className="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {projects.map((p) => (
+            <tr key={p.id}>
+              <td>
+                <div className="project-name">
+                  <span className={`project-symbol ${p.color}`}>
+                    <FolderKanban size={18} />
+                  </span>
+                  <strong>{p.name}</strong>
+                </div>
+              </td>
+              <td>
+                {state.clients.find((c) => c.id === p.clientId)?.company ??
+                  "Unassigned"}
+              </td>
+              <td>
+                <Badge value={p.status} />
+              </td>
+              <td>
+                <div className="table-progress">
+                  <Progress value={p.progress} />
+                  <span>{p.progress}%</span>
+                </div>
+              </td>
+              <td className="nowrap">{dateLabel(p.due)}</td>
+              <td>{money(p.budget)}</td>
+              <td>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Edit ${p.name}`}
+                  onClick={() => onEdit(p)}
+                >
+                  <MoreHorizontal size={18} />
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ) : (
+    <Empty
+      title="No active projects"
+      description="Create a project to bring your workspace to life."
+    />
+  );
+}
+export function Overview() {
+  const { state } = useStore();
+  const [form, setForm] = useState(false);
+  const [edit, setEdit] = useState<Project>();
+  const [period, setPeriod] = useState("6");
+  const active = state.projects.filter((p) => p.status !== "Completed");
+  const done = state.tasks.filter((t) => t.status === "Done").length;
+  return (
+    <>
+      <PageTitle
+        eyebrow="YOUR WORK, IN FOCUS"
+        title="Good morning, Alex 👋"
+        description="Here’s what’s happening in your workspace today."
+      >
+        <span className="date-display">
+          <CalendarDays size={16} />
+          {new Date().toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
+        </span>
+        <Button onClick={() => setForm(true)}>
+          <Plus size={17} /> New project
+        </Button>
+      </PageTitle>
+      <div className="metrics-grid">
+        <Metric
+          label="Monthly revenue"
+          value="$28,600"
+          note="vs. previous demo month"
+          icon={DollarSign}
+          trend="33.0%"
+        />
+        <Metric
+          label="Active clients"
+          value={String(
+            state.clients.filter((c) => c.status === "Active").length,
+          ).padStart(2, "0")}
+          note={`${state.clients.length} clients in your workspace`}
+          icon={Users}
+          tone="blue"
+        />
+        <Metric
+          label="Active projects"
+          value={String(active.length).padStart(2, "0")}
+          note={`${state.projects.filter((p) => p.status === "Review").length} ready for review`}
+          icon={FolderKanban}
+          tone="amber"
+        />
+        <Metric
+          label="Tasks completed"
+          value={String(done).padStart(2, "0")}
+          note={`out of ${state.tasks.length} total tasks`}
+          icon={CheckCheck}
+          tone="green"
+        />
+      </div>
+      <div className="overview-middle">
+        <section className="card revenue-card">
+          <div className="section-heading">
+            <div>
+              <h2>Revenue overview</h2>
+              <p>A little perspective on your progress.</p>
+            </div>
+            <select
+              aria-label="Revenue period"
+              value={period}
+              onChange={(e) => setPeriod(e.target.value)}
+            >
+              <option value="6">Last 6 months</option>
+              <option value="3">Last 3 months</option>
+            </select>
+          </div>
+          <div className="revenue-summary">
+            <strong>
+              {money(
+                revenue
+                  .slice(-Number(period))
+                  .reduce((s, r) => s + r.revenue, 0),
+              )}
+            </strong>
+            <span className="badge badge-active">Fictional revenue</span>
+          </div>
+          <RevenueChart period={period} />
+          <div className="chart-caption">
+            <i /> Revenue <span>USD · illustrative data</span>
+          </div>
+        </section>
+        <section className="card activity-card">
+          <div className="section-heading">
+            <div>
+              <h2>Recent activity</h2>
+              <p>The latest across your workspace.</p>
+            </div>
+            <span className="subtle-icon">
+              <Clock3 size={18} />
+            </span>
+          </div>
+          <div className="activity-list">
+            {state.activity.slice(0, 4).map((a, i) => (
+              <div key={a.id}>
+                <span
+                  className={`activity-icon ${["purple", "blue", "green", "amber"][i]}`}
+                >
+                  {i % 2 ? <Users size={15} /> : <CheckCircle2 size={15} />}
+                </span>
+                <div>
+                  <strong>{a.text}</strong>
+                  <small>
+                    {new Date(a.time).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })}{" "}
+                    · Demo activity
+                  </small>
+                </div>
+              </div>
+            ))}
+          </div>
+          <Link href="/board" className="text-link">
+            Go to task board <ArrowRight size={15} />
+          </Link>
+        </section>
+      </div>
+      <section className="card">
+        <div className="section-heading">
+          <div className="heading-inline">
+            <h2>Active projects</h2>
+            <span className="count-pill">{active.length}</span>
+          </div>
+          <Link href="/projects" className="text-link">
+            View all projects <ArrowUpRight size={16} />
+          </Link>
+        </div>
+        <ProjectTable projects={active.slice(0, 4)} onEdit={setEdit} />
+      </section>
+      <div className="insight-strip">
+        <span className="insight-icon">
+          <Sparkle />
+        </span>
+        <div>
+          <strong>Space for your next big idea.</strong>
+          <p>
+            Good work starts with a little clarity. Your workspace is ready.
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => setForm(true)}>
+          Start a project <ArrowUpRight size={16} />
+        </Button>
+      </div>
+      {(form || edit) && (
+        <EntityForm
+          kind="project"
+          project={edit}
+          onClose={() => {
+            setForm(false);
+            setEdit(undefined);
+          }}
+        />
+      )}
+    </>
+  );
+}
+function Sparkle() {
+  return <span aria-hidden="true">✧</span>;
+}
+export function Clients() {
+  const { state, deleteClient } = useStore();
+  const [query, setQuery] = useState("");
+  const [status, setStatus] = useState("All statuses");
+  const [form, setForm] = useState(false);
+  const [remove, setRemove] = useState<Client>();
+  const clients = state.clients.filter(
+    (c) =>
+      (c.name + " " + c.company + " " + c.email)
+        .toLowerCase()
+        .includes(query.toLowerCase()) &&
+      (status === "All statuses" || c.status === status),
+  );
+  return (
+    <>
+      <PageTitle
+        eyebrow="RELATIONSHIPS THAT MATTER"
+        title="Your clients"
+        description="A thoughtful home for every client connection."
+      >
+        <Button onClick={() => setForm(true)}>
+          <Plus size={17} /> Add client
+        </Button>
+      </PageTitle>
+      <div className="metrics-grid three">
+        <Metric
+          label="All clients"
+          value={String(state.clients.length)}
+          note="Fictional relationships"
+          icon={Users}
+        />
+        <Metric
+          label="Active clients"
+          value={String(
+            state.clients.filter((c) => c.status === "Active").length,
+          )}
+          note="Let’s keep good work moving"
+          icon={CheckCircle2}
+          tone="green"
+        />
+        <Metric
+          label="New opportunities"
+          value={String(
+            state.clients.filter((c) => c.status === "Lead").length,
+          )}
+          note="Leads in your workspace"
+          icon={Target}
+          tone="amber"
+        />
+      </div>
+      <section className="card">
+        <div className="toolbar">
+          <div className="local-search">
+            <Search size={17} />
+            <input
+              aria-label="Search clients"
+              placeholder="Search clients by name, company or email…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <div className="filter-control">
+            <SlidersHorizontal size={16} />
+            <select
+              aria-label="Filter client status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              {["All statuses", "Active", "Lead", "Inactive"].map((s) => (
+                <option key={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        {clients.length ? (
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Company</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Projects</th>
+                  <th>
+                    <span className="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {clients.map((c, i) => (
+                  <tr key={c.id}>
+                    <td>
+                      <div className="client-name">
+                        <span
+                          className={`avatar ${["purple", "blue", "green", "amber"][i % 4]}`}
+                        >
+                          {initials(c.name)}
+                        </span>
+                        <strong>{c.name}</strong>
+                      </div>
+                    </td>
+                    <td>{c.company}</td>
+                    <td>
+                      <span className="muted">{c.email}</span>
+                    </td>
+                    <td>
+                      <Badge value={c.status} />
+                    </td>
+                    <td>
+                      {state.projects.filter((p) => p.clientId === c.id).length}
+                    </td>
+                    <td>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={`Delete ${c.company}`}
+                        onClick={() => setRemove(c)}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <Empty
+            title="No clients found"
+            description="Try another search or add your first fictional client."
+            action={<Button onClick={() => setForm(true)}>Add client</Button>}
+          />
+        )}
+        <div className="table-footer">
+          Showing {clients.length} of {state.clients.length} fictional clients
+          <span>Saved in this browser</span>
+        </div>
+      </section>
+      {form && <EntityForm kind="client" onClose={() => setForm(false)} />}{" "}
+      {remove && (
+        <Dialog
+          open
+          onOpenChange={(o) => {
+            if (!o) setRemove(undefined);
+          }}
+          title={`Delete ${remove.company}?`}
+          description={
+            state.projects.some((p) => p.clientId === remove.id)
+              ? "This client has linked projects. Edit those projects and reassign their client before deleting this client."
+              : "This removes the fictional client from your local workspace. This action cannot be undone."
+          }
+        >
+          <div className="form-actions">
+            <Button variant="outline" onClick={() => setRemove(undefined)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={state.projects.some((p) => p.clientId === remove.id)}
+              onClick={() => {
+                deleteClient(remove.id);
+                setRemove(undefined);
+              }}
+            >
+              Delete client
+            </Button>
+          </div>
+        </Dialog>
+      )}
+    </>
+  );
+}
+export function Projects() {
+  const { state } = useStore();
+  const [view, setView] = useState("grid");
+  const [query, setQuery] = useState("");
+  const [status, setStatus] = useState("All statuses");
+  const [form, setForm] = useState(false);
+  const [edit, setEdit] = useState<Project>();
+  const projects = state.projects.filter(
+    (p) =>
+      p.name.toLowerCase().includes(query.toLowerCase()) &&
+      (status === "All statuses" || p.status === status),
+  );
+  return (
+    <>
+      <PageTitle
+        eyebrow="IDEAS INTO MOMENTUM"
+        title="Your projects"
+        description="From the first spark to the final detail. Keep it all in view."
+      >
+        <Button onClick={() => setForm(true)}>
+          <Plus size={17} /> New project
+        </Button>
+      </PageTitle>
+      <div className="project-summary">
+        <span>
+          <i className="dot purple-bg" />
+          {state.projects.length} total projects
+        </span>
+        <span>
+          <i className="dot blue-bg" />
+          {state.projects.filter((p) => p.status === "In progress").length} in
+          progress
+        </span>
+        <span>
+          <i className="dot green-bg" />
+          {state.projects.filter((p) => p.status === "Completed").length}{" "}
+          completed
+        </span>
+        <span className="summary-budget">
+          {money(state.projects.reduce((s, p) => s + p.budget, 0))} total budget
+        </span>
+      </div>
+      <div className="toolbar standalone">
+        <div className="local-search">
+          <Search size={17} />
+          <input
+            aria-label="Search projects"
+            placeholder="Search projects…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <select
+          aria-label="Filter project status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          {[
+            "All statuses",
+            "Planning",
+            "In progress",
+            "Review",
+            "Completed",
+          ].map((s) => (
+            <option key={s}>{s}</option>
+          ))}
+        </select>
+        <div className="view-switch" aria-label="Project view">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Card view"
+            aria-pressed={view === "grid"}
+            onClick={() => setView("grid")}
+          >
+            <LayoutGrid size={18} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="List view"
+            aria-pressed={view === "list"}
+            onClick={() => setView("list")}
+          >
+            <List size={18} />
+          </Button>
+        </div>
+      </div>
+      {!projects.length ? (
+        <div className="card">
+          <Empty
+            title="No projects here yet"
+            description="Try a different filter or create a new project."
+            action={<Button onClick={() => setForm(true)}>New project</Button>}
+          />
+        </div>
+      ) : view === "list" ? (
+        <section className="card">
+          <ProjectTable projects={projects} onEdit={setEdit} />
+        </section>
+      ) : (
+        <div className="projects-grid">
+          {projects.map((p) => (
+            <article className="card project-card" key={p.id}>
+              <div className="project-card-top">
+                <span className={`project-symbol ${p.color}`}>
+                  <FolderKanban size={22} />
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Edit ${p.name}`}
+                  onClick={() => setEdit(p)}
+                >
+                  <MoreHorizontal size={20} />
+                </Button>
+              </div>
+              <span className="project-client">
+                {state.clients.find((c) => c.id === p.clientId)?.company}
+              </span>
+              <h2>
+                <button className="title-button" onClick={() => setEdit(p)}>
+                  {p.name}
+                </button>
+              </h2>
+              <p className="project-description">{p.description}</p>
+              <div className="badge-row">
+                <Badge value={p.status} />
+                <Badge value={p.priority} />
+              </div>
+              <div className="progress-label">
+                <span>Progress</span>
+                <strong>{p.progress}%</strong>
+              </div>
+              <Progress value={p.progress} />
+              <div className="project-meta">
+                <span>
+                  <CalendarDays size={14} />
+                  {dateLabel(p.due)}
+                </span>
+                <span>
+                  <CheckCheck size={14} />
+                  {state.tasks.filter((t) => t.projectId === p.id).length} tasks
+                </span>
+              </div>
+              <div className="project-card-footer">
+                <span>
+                  <span className="avatar mini">AM</span> Alex Morgan
+                </span>
+                <strong>{money(p.budget)}</strong>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+      {(form || edit) && (
+        <EntityForm
+          kind="project"
+          project={edit}
+          onClose={() => {
+            setForm(false);
+            setEdit(undefined);
+          }}
+        />
+      )}
+    </>
+  );
+}
+export function Reports() {
+  const { state } = useStore();
+  const data = ["Planning", "In progress", "Review", "Completed"].map(
+    (name) => ({
+      name,
+      value: state.projects.filter((p) => p.status === name).length,
+    }),
+  );
+  const total = state.projects.reduce((s, p) => s + p.budget, 0);
+  const done = state.projects.filter((p) => p.status === "Completed").length;
+  const overdue = state.projects.filter(
+    (p) =>
+      p.status !== "Completed" && p.due < new Date().toISOString().slice(0, 10),
+  ).length;
+  const ranked = state.clients
+    .map((c) => ({
+      ...c,
+      value: state.projects
+        .filter((p) => p.clientId === c.id)
+        .reduce((s, p) => s + p.budget, 0),
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+  return (
+    <>
+      <PageTitle
+        eyebrow="THE BIGGER PICTURE"
+        title="Workspace reports"
+        description="Turn a little perspective into your next good decision."
+      >
+        <span className="report-period">
+          <CalendarDays size={16} /> May – October 2026
+        </span>
+      </PageTitle>
+      <div className="report-note">
+        <span>✧</span>
+        <p>
+          Illustrative insights only. Revenue and goals are fixed fictional
+          samples; project and client metrics update with your workspace.
+        </p>
+      </div>
+      <div className="metrics-grid">
+        <Metric
+          label="Fictional revenue"
+          value={money(revenue.reduce((s, r) => s + r.revenue, 0))}
+          note="May – October 2026 sample"
+          icon={DollarSign}
+        />
+        <Metric
+          label="Monthly goal reached"
+          value="110%"
+          note="$28,600 of $26,000 · October"
+          icon={Target}
+          tone="green"
+        />
+        <Metric
+          label="Project completion"
+          value={`${state.projects.length ? Math.round((done / state.projects.length) * 100) : 0}%`}
+          note={`${done} of ${state.projects.length} projects completed`}
+          icon={CheckCheck}
+          tone="blue"
+        />
+        <Metric
+          label="Overdue projects"
+          value={String(overdue)}
+          note="Open projects past their due date"
+          icon={Clock3}
+          tone="amber"
+        />
+      </div>
+      <div className="reports-grid">
+        <section className="card">
+          <div className="section-heading">
+            <div>
+              <h2>Revenue vs. goals</h2>
+              <p>Six months of fictional momentum.</p>
+            </div>
+            <div className="inline-legend">
+              <span>
+                <i className="purple-bg" />
+                Revenue
+              </span>
+              <span>
+                <i className="light-purple-bg" />
+                Goal
+              </span>
+            </div>
+          </div>
+          <TargetChart />
+        </section>
+        <section className="card">
+          <div className="section-heading">
+            <div>
+              <h2>Project health</h2>
+              <p>A live snapshot of your workspace.</p>
+            </div>
+          </div>
+          {state.projects.length ? (
+            <StatusChart data={data} />
+          ) : (
+            <Empty
+              title="No project data"
+              description="Create a project to see its status here."
+            />
+          )}
+        </section>
+      </div>
+      <div className="reports-bottom">
+        <section className="card">
+          <div className="section-heading">
+            <div>
+              <h2>Top fictional clients</h2>
+              <p>Ranked by the total budget of linked projects.</p>
+            </div>
+            <span className="subtle-icon">
+              <Users size={18} />
+            </span>
+          </div>
+          {ranked.length ? (
+            <div className="ranking">
+              {ranked.map((c, i) => (
+                <div key={c.id}>
+                  <span className="rank-number">0{i + 1}</span>
+                  <span
+                    className={`avatar ${["purple", "blue", "green", "amber"][i % 4]}`}
+                  >
+                    {initials(c.company)}
+                  </span>
+                  <div className="rank-details">
+                    <strong>{c.company}</strong>
+                    <div className="progress">
+                      <span
+                        style={{
+                          width: `${ranked[0].value ? (c.value / ranked[0].value) * 100 : 0}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <strong>{money(c.value)}</strong>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <Empty
+              title="No clients yet"
+              description="Add a fictional client to see their project value here."
+            />
+          )}
+        </section>
+        <section className="card delivery-card">
+          <span className="metric-icon green">
+            <CheckCircle2 size={22} />
+          </span>
+          <h2>Delivery at a glance</h2>
+          <p>Clear expectations. Thoughtful follow-through.</p>
+          <div>
+            <span>Completed projects</span>
+            <strong>{done}</strong>
+          </div>
+          <div>
+            <span>Open & within deadline</span>
+            <strong>{state.projects.length - done - overdue}</strong>
+          </div>
+          <div>
+            <span>Past due date</span>
+            <strong>{overdue}</strong>
+          </div>
+          <div>
+            <span>Workspace project budgets</span>
+            <strong>{money(total)}</strong>
+          </div>
+          <small>
+            Dates are compared with today. Completion dates are not tracked;
+            this is a current deadline snapshot.
+          </small>
+        </section>
+      </div>
+    </>
+  );
+}

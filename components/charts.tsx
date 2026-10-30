@@ -1,6 +1,166 @@
 "use client";
-import { AreaChart,Area,CartesianGrid,XAxis,YAxis,Tooltip,ResponsiveContainer,BarChart,Bar,PieChart,Pie,Cell } from "recharts";
-import { revenue,money } from "@/lib/data";
-export function RevenueChart({period="6"}:{period?:string}){const data=revenue.slice(-Number(period));return <div className="chart" role="img" aria-label={`Fictional monthly revenue: ${data.map(r=>`${r.month} ${money(r.revenue)}`).join(", ")}`}><ResponsiveContainer width="100%" height="100%"><AreaChart data={data} margin={{top:20,right:15,left:-15,bottom:0}} accessibilityLayer><defs><linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#6C5CE7" stopOpacity={.22}/><stop offset="100%" stopColor="#6C5CE7" stopOpacity={0}/></linearGradient></defs><CartesianGrid vertical={false} stroke="#edf0f6" strokeDasharray="4 4"/><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize:12,fill:"#67738a"}} dy={10}/><YAxis axisLine={false} tickLine={false} tickFormatter={v=>`$${v/1000}k`} tick={{fontSize:11,fill:"#67738a"}}/><Tooltip formatter={v=>money(Number(v))} contentStyle={{borderRadius:12,border:"1px solid #e6e9f1"}}/><Area name="Revenue" type="monotone" dataKey="revenue" stroke="#6C5CE7" strokeWidth={3} fill="url(#revenueGradient)" activeDot={{r:6,stroke:"white",strokeWidth:3}}/></AreaChart></ResponsiveContainer></div>;}
-export function TargetChart(){return <div className="chart" role="img" aria-label="Fictional revenue versus monthly goals. October revenue $28,600; goal $26,000."><ResponsiveContainer width="100%" height="100%"><BarChart data={revenue} margin={{top:15,right:5,left:-15,bottom:0}} accessibilityLayer><CartesianGrid vertical={false} stroke="#edf0f6"/><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize:12}}/><YAxis axisLine={false} tickLine={false} tickFormatter={v=>`$${v/1000}k`} tick={{fontSize:11}}/><Tooltip formatter={v=>money(Number(v))} contentStyle={{borderRadius:12}}/><Bar dataKey="revenue" name="Revenue" fill="#6C5CE7" radius={[4,4,0,0]}/><Bar dataKey="target" name="Goal" fill="#ded9fd" radius={[4,4,0,0]}/></BarChart></ResponsiveContainer></div>;}
-export function StatusChart({data}:{data:{name:string;value:number}[]}){const colors=["#b6adf5","#6c5ce7","#53a0ed","#42b69a"];return <div className="donut-layout"><div className="donut" role="img" aria-label={data.map(d=>`${d.name}: ${d.value}`).join(", ")}><ResponsiveContainer width="100%" height="100%"><PieChart accessibilityLayer><Pie data={data} dataKey="value" innerRadius="64%" outerRadius="90%" paddingAngle={4} stroke="none">{data.map((d,i)=><Cell key={d.name} fill={colors[i]}/>)}</Pie><Tooltip/></PieChart></ResponsiveContainer><div className="donut-total"><strong>{data.reduce((s,d)=>s+d.value,0)}</strong><small>projects</small></div></div><div className="chart-legend">{data.map((d,i)=><div key={d.name}><i style={{background:colors[i]}}/><span>{d.name}</span><strong>{d.value}</strong></div>)}</div></div>;}
+import {
+  AreaChart,
+  Area,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import { revenue, money } from "@/lib/data";
+export function RevenueChart({ period = "6" }: { period?: string }) {
+  const data = revenue.slice(-Number(period));
+  return (
+    <div
+      className="chart"
+      role="img"
+      aria-label={`Fictional monthly revenue: ${data.map((r) => `${r.month} ${money(r.revenue)}`).join(", ")}`}
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart
+          data={data}
+          margin={{ top: 20, right: 15, left: -15, bottom: 0 }}
+          accessibilityLayer
+        >
+          <defs>
+            <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#6C5CE7" stopOpacity={0.22} />
+              <stop offset="100%" stopColor="#6C5CE7" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid
+            vertical={false}
+            stroke="#edf0f6"
+            strokeDasharray="4 4"
+          />
+          <XAxis
+            dataKey="month"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12, fill: "#67738a" }}
+            dy={10}
+          />
+          <YAxis
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={(v) => `$${v / 1000}k`}
+            tick={{ fontSize: 11, fill: "#67738a" }}
+          />
+          <Tooltip
+            formatter={(v) => money(Number(v))}
+            contentStyle={{ borderRadius: 12, border: "1px solid #e6e9f1" }}
+          />
+          <Area
+            name="Revenue"
+            type="monotone"
+            dataKey="revenue"
+            stroke="#6C5CE7"
+            strokeWidth={3}
+            fill="url(#revenueGradient)"
+            activeDot={{ r: 6, stroke: "white", strokeWidth: 3 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+export function TargetChart() {
+  return (
+    <div
+      className="chart"
+      role="img"
+      aria-label="Fictional revenue versus monthly goals. October revenue $28,600; goal $26,000."
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={revenue}
+          margin={{ top: 15, right: 5, left: -15, bottom: 0 }}
+          accessibilityLayer
+        >
+          <CartesianGrid vertical={false} stroke="#edf0f6" />
+          <XAxis
+            dataKey="month"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12 }}
+          />
+          <YAxis
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={(v) => `$${v / 1000}k`}
+            tick={{ fontSize: 11 }}
+          />
+          <Tooltip
+            formatter={(v) => money(Number(v))}
+            contentStyle={{ borderRadius: 12 }}
+          />
+          <Bar
+            dataKey="revenue"
+            name="Revenue"
+            fill="#6C5CE7"
+            radius={[4, 4, 0, 0]}
+          />
+          <Bar
+            dataKey="target"
+            name="Goal"
+            fill="#ded9fd"
+            radius={[4, 4, 0, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+export function StatusChart({
+  data,
+}: {
+  data: { name: string; value: number }[];
+}) {
+  const colors = ["#b6adf5", "#6c5ce7", "#53a0ed", "#42b69a"];
+  return (
+    <div className="donut-layout">
+      <div
+        className="donut"
+        role="img"
+        aria-label={data.map((d) => `${d.name}: ${d.value}`).join(", ")}
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart accessibilityLayer>
+            <Pie
+              data={data}
+              dataKey="value"
+              innerRadius="64%"
+              outerRadius="90%"
+              paddingAngle={4}
+              stroke="none"
+            >
+              {data.map((d, i) => (
+                <Cell key={d.name} fill={colors[i]} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="donut-total">
+          <strong>{data.reduce((s, d) => s + d.value, 0)}</strong>
+          <small>projects</small>
+        </div>
+      </div>
+      <div className="chart-legend">
+        {data.map((d, i) => (
+          <div key={d.name}>
+            <i style={{ background: colors[i] }} />
+            <span>{d.name}</span>
+            <strong>{d.value}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

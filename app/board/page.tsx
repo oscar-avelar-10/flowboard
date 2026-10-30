@@ -1,2 +1,4 @@
 import { Board } from "@/components/board";
-export default function Page() { return <Board />; }
+export default function Page() {
+  return <Board />;
+}

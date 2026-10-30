@@ -1,14 +1,344 @@
 "use client";
-import { useState,type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { usePathname,useRouter } from "next/navigation";
-import { LayoutDashboard,Users,FolderKanban,Columns3,ChartNoAxesCombined,Search,Bell,ChevronDown,Menu,X,ArrowUpRight,Sparkles,RotateCcw } from "lucide-react";
-import { Provider,useStore } from "./store";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  LayoutDashboard,
+  Users,
+  FolderKanban,
+  Columns3,
+  ChartNoAxesCombined,
+  Search,
+  Bell,
+  ChevronDown,
+  Menu,
+  X,
+  ArrowUpRight,
+  Sparkles,
+  RotateCcw,
+} from "lucide-react";
+import { Provider, useStore } from "./store";
 import { Button } from "./ui/button";
 import { Dialog } from "./ui/dialog";
 import { EntityForm } from "./forms";
 import { initials } from "@/lib/data";
-const nav=[{href:"/",label:"Overview",Icon:LayoutDashboard},{href:"/clients",label:"Clients",Icon:Users},{href:"/projects",label:"Projects",Icon:FolderKanban},{href:"/board",label:"Task board",Icon:Columns3},{href:"/reports",label:"Reports",Icon:ChartNoAxesCombined}];
-function Shell({children}:{children:ReactNode}){const path=usePathname();const router=useRouter();const {state,ready,warning,notice,notify,reset}=useStore();const [mobile,setMobile]=useState(false);const [panel,setPanel]=useState<"notifications"|"profile"|"reset"|null>(null);const [query,setQuery]=useState("");const [searching,setSearching]=useState(false);const [newProject,setNewProject]=useState(false);const q=query.toLowerCase().trim();const results=q?[...state.clients.filter(c=>(c.name+c.company).toLowerCase().includes(q)).map(c=>({id:c.id,label:c.company,detail:c.name,href:"/clients"})),...state.projects.filter(p=>p.name.toLowerCase().includes(q)).map(p=>({id:p.id,label:p.name,detail:p.status,href:"/projects"})),...state.tasks.filter(t=>t.title.toLowerCase().includes(q)).map(t=>({id:t.id,label:t.title,detail:t.status,href:"/board"}))].slice(0,7):[];
-return <><a href="#main" className="skip-link">Skip to content</a>{mobile&&<button className="mobile-scrim" aria-label="Close navigation" onClick={()=>setMobile(false)}/>}<aside className={`sidebar ${mobile?"is-open":""}`}><Link href="/" className="brand" onClick={()=>setMobile(false)}><span className="brand-mark"><i/><i/><i/></span>flowboard<span className="brand-dot">.</span></Link><div className="workspace-label"><span className="workspace-symbol">F</span><div>Freelance workspace<small>Personal portfolio</small></div><ChevronDown size={14}/></div><div className="nav-caption">WORKSPACE</div><nav aria-label="Main navigation">{nav.map(({href,label,Icon})=><Link key={href} href={href} aria-current={path===href?"page":undefined} className={path===href?"active":""} onClick={()=>setMobile(false)}><Icon size={19}/>{label}{href==="/board"&&<span className="nav-count">{state.tasks.filter(t=>t.status!=="Done").length}</span>}</Link>)}</nav><div className="sidebar-bottom"><div className="portfolio-card"><Sparkles size={20}/><strong>Built to explore.</strong><p>An original portfolio project.<br/>Every business here is fictional.</p><Link href="/reports" onClick={()=>setMobile(false)}>Explore the numbers <ArrowUpRight size={15}/></Link></div><button className="sidebar-profile" onClick={()=>setPanel("profile")}><span className="avatar">AM</span><span>Alex Morgan<small>Demo workspace</small></span><ChevronDown size={15}/></button></div></aside><div className="app-body"><header className="topbar"><Button variant="ghost" size="icon" className="mobile-toggle" aria-label="Open navigation" onClick={()=>setMobile(true)}><Menu size={21}/></Button><div className="breadcrumb">Workspace <span>/</span> <strong>{nav.find(n=>n.href===path)?.label??"Page"}</strong></div><div className="global-search"><Search size={17}/><input aria-label="Search workspace" placeholder="Search anything…" value={query} onChange={e=>{setQuery(e.target.value);setSearching(true);}} onFocus={()=>setSearching(true)} onKeyDown={e=>{if(e.key==="Escape")setSearching(false);}}/>{searching&&q&&<div className="search-results"><div className="search-heading">Workspace results <button aria-label="Close search results" onClick={()=>setSearching(false)}><X size={15}/></button></div>{results.length?results.map(r=><button key={r.id} onClick={()=>{router.push(r.href);setQuery("");setSearching(false);}}><strong>{r.label}</strong><small>{r.detail}</small></button>):<p>No matches. Try a project or client name.</p>}</div>}</div><div className="top-actions"><span className="demo-pill">Demo workspace</span><Button variant="ghost" size="icon" aria-label="Notifications" onClick={()=>setPanel("notifications")}><Bell size={19}/><span className="notification-dot"/></Button><button className="avatar avatar-top" aria-label="Open demo profile" onClick={()=>setPanel("profile")}>AM</button></div></header><main id="main" tabIndex={-1}><div className="demo-banner"><span className="live-dot"/>Personal portfolio project <span className="banner-separator">·</span> All companies, people and metrics are fictional.</div>{warning&&<div className="storage-warning" role="alert">{warning}</div>}{!ready?<div className="loading-state" role="status">Opening your workspace…</div>:children}<footer><span>FlowBoard <span>© 2026</span></span><span>Made with intention. Built for a portfolio.</span><button onClick={()=>setPanel("reset")}><RotateCcw size={13}/> Reset demo data</button></footer></main></div><div className="toast-region" aria-live="polite" aria-atomic="true">{notice&&<div className="toast"><span>{notice}</span><button aria-label="Dismiss message" onClick={()=>notify("")}><X size={16}/></button></div>}</div>{panel&&<Dialog open onOpenChange={o=>{if(!o)setPanel(null);}} title={panel==="notifications"?"Workspace activity":panel==="profile"?"Your demo profile":"Restore the demo?"} description={panel==="reset"?"This replaces all locally saved clients, projects and tasks with the original fictional sample data.":"A fictional workspace created for a personal portfolio."}>{panel==="notifications"?<div className="activity-list">{state.activity.map(a=><div key={a.id}><span className="activity-dot"/><div><strong>{a.text}</strong><small>{new Date(a.time).toLocaleString("en-US")}</small></div></div>)}</div>:panel==="profile"?<div className="profile-content"><span className="avatar avatar-large">{initials("Alex Morgan")}</span><h3>Alex Morgan</h3><p>Independent designer & developer</p><p className="muted">Fictional persona · Local demo account</p><Button onClick={()=>{setPanel(null);setNewProject(true);}}>Create a project</Button></div>:<div className="form-actions"><Button variant="outline" onClick={()=>setPanel(null)}>Keep my changes</Button><Button variant="destructive" onClick={()=>{reset();setPanel(null);}}>Reset demo data</Button></div>}</Dialog>}{newProject&&<EntityForm kind="project" onClose={()=>setNewProject(false)}/>}</>;}
-export function Workspace({children}:{children:ReactNode}){return <Provider><Shell>{children}</Shell></Provider>;}
+const nav = [
+  { href: "/", label: "Overview", Icon: LayoutDashboard },
+  { href: "/clients", label: "Clients", Icon: Users },
+  { href: "/projects", label: "Projects", Icon: FolderKanban },
+  { href: "/board", label: "Task board", Icon: Columns3 },
+  { href: "/reports", label: "Reports", Icon: ChartNoAxesCombined },
+];
+function Shell({ children }: { children: ReactNode }) {
+  const path = usePathname();
+  const router = useRouter();
+  const { state, ready, warning, notice, notify, reset } = useStore();
+  const [mobile, setMobile] = useState(false);
+  const [panel, setPanel] = useState<
+    "notifications" | "profile" | "reset" | null
+  >(null);
+  const [query, setQuery] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [newProject, setNewProject] = useState(false);
+  const q = query.toLowerCase().trim();
+  const results = q
+    ? [
+        ...state.clients
+          .filter((c) => (c.name + c.company).toLowerCase().includes(q))
+          .map((c) => ({
+            id: c.id,
+            label: c.company,
+            detail: c.name,
+            href: "/clients",
+          })),
+        ...state.projects
+          .filter((p) => p.name.toLowerCase().includes(q))
+          .map((p) => ({
+            id: p.id,
+            label: p.name,
+            detail: p.status,
+            href: "/projects",
+          })),
+        ...state.tasks
+          .filter((t) => t.title.toLowerCase().includes(q))
+          .map((t) => ({
+            id: t.id,
+            label: t.title,
+            detail: t.status,
+            href: "/board",
+          })),
+      ].slice(0, 7)
+    : [];
+  return (
+    <>
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
+      {mobile && (
+        <button
+          className="mobile-scrim"
+          aria-label="Close navigation"
+          onClick={() => setMobile(false)}
+        />
+      )}
+      <aside className={`sidebar ${mobile ? "is-open" : ""}`}>
+        <Link href="/" className="brand" onClick={() => setMobile(false)}>
+          <span className="brand-mark">
+            <i />
+            <i />
+            <i />
+          </span>
+          flowboard<span className="brand-dot">.</span>
+        </Link>
+        <div className="workspace-label">
+          <span className="workspace-symbol">F</span>
+          <div>
+            Freelance workspace<small>Personal portfolio</small>
+          </div>
+          <ChevronDown size={14} />
+        </div>
+        <div className="nav-caption">WORKSPACE</div>
+        <nav aria-label="Main navigation">
+          {nav.map(({ href, label, Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              aria-current={path === href ? "page" : undefined}
+              className={path === href ? "active" : ""}
+              onClick={() => setMobile(false)}
+            >
+              <Icon size={19} />
+              {label}
+              {href === "/board" && (
+                <span className="nav-count">
+                  {state.tasks.filter((t) => t.status !== "Done").length}
+                </span>
+              )}
+            </Link>
+          ))}
+        </nav>
+        <div className="sidebar-bottom">
+          <div className="portfolio-card">
+            <Sparkles size={20} />
+            <strong>Built to explore.</strong>
+            <p>
+              An original portfolio project.
+              <br />
+              Every business here is fictional.
+            </p>
+            <Link href="/reports" onClick={() => setMobile(false)}>
+              Explore the numbers <ArrowUpRight size={15} />
+            </Link>
+          </div>
+          <button
+            className="sidebar-profile"
+            onClick={() => setPanel("profile")}
+          >
+            <span className="avatar">AM</span>
+            <span>
+              Alex Morgan<small>Demo workspace</small>
+            </span>
+            <ChevronDown size={15} />
+          </button>
+        </div>
+      </aside>
+      <div className="app-body">
+        <header className="topbar">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="mobile-toggle"
+            aria-label="Open navigation"
+            onClick={() => setMobile(true)}
+          >
+            <Menu size={21} />
+          </Button>
+          <div className="breadcrumb">
+            Workspace <span>/</span>{" "}
+            <strong>{nav.find((n) => n.href === path)?.label ?? "Page"}</strong>
+          </div>
+          <div className="global-search">
+            <Search size={17} />
+            <input
+              aria-label="Search workspace"
+              placeholder="Search anything…"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setSearching(true);
+              }}
+              onFocus={() => setSearching(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setSearching(false);
+              }}
+            />
+            {searching && q && (
+              <div className="search-results">
+                <div className="search-heading">
+                  Workspace results{" "}
+                  <button
+                    aria-label="Close search results"
+                    onClick={() => setSearching(false)}
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
+                {results.length ? (
+                  results.map((r) => (
+                    <button
+                      key={r.id}
+                      onClick={() => {
+                        router.push(r.href);
+                        setQuery("");
+                        setSearching(false);
+                      }}
+                    >
+                      <strong>{r.label}</strong>
+                      <small>{r.detail}</small>
+                    </button>
+                  ))
+                ) : (
+                  <p>No matches. Try a project or client name.</p>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="top-actions">
+            <span className="demo-pill">Demo workspace</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Notifications"
+              onClick={() => setPanel("notifications")}
+            >
+              <Bell size={19} />
+              <span className="notification-dot" />
+            </Button>
+            <button
+              className="avatar avatar-top"
+              aria-label="Open demo profile"
+              onClick={() => setPanel("profile")}
+            >
+              AM
+            </button>
+          </div>
+        </header>
+        <main id="main" tabIndex={-1}>
+          <div className="demo-banner">
+            <span className="live-dot" />
+            Personal portfolio project{" "}
+            <span className="banner-separator">·</span> All companies, people
+            and metrics are fictional.
+          </div>
+          {warning && (
+            <div className="storage-warning" role="alert">
+              {warning}
+            </div>
+          )}
+          {!ready ? (
+            <div className="loading-state" role="status">
+              Opening your workspace…
+            </div>
+          ) : (
+            children
+          )}
+          <footer>
+            <span>
+              FlowBoard <span>© 2026</span>
+            </span>
+            <span>Made with intention. Built for a portfolio.</span>
+            <button onClick={() => setPanel("reset")}>
+              <RotateCcw size={13} /> Reset demo data
+            </button>
+          </footer>
+        </main>
+      </div>
+      <div className="toast-region" aria-live="polite" aria-atomic="true">
+        {notice && (
+          <div className="toast">
+            <span>{notice}</span>
+            <button aria-label="Dismiss message" onClick={() => notify("")}>
+              <X size={16} />
+            </button>
+          </div>
+        )}
+      </div>
+      {panel && (
+        <Dialog
+          open
+          onOpenChange={(o) => {
+            if (!o) setPanel(null);
+          }}
+          title={
+            panel === "notifications"
+              ? "Workspace activity"
+              : panel === "profile"
+                ? "Your demo profile"
+                : "Restore the demo?"
+          }
+          description={
+            panel === "reset"
+              ? "This replaces all locally saved clients, projects and tasks with the original fictional sample data."
+              : "A fictional workspace created for a personal portfolio."
+          }
+        >
+          {panel === "notifications" ? (
+            <div className="activity-list">
+              {state.activity.map((a) => (
+                <div key={a.id}>
+                  <span className="activity-dot" />
+                  <div>
+                    <strong>{a.text}</strong>
+                    <small>{new Date(a.time).toLocaleString("en-US")}</small>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : panel === "profile" ? (
+            <div className="profile-content">
+              <span className="avatar avatar-large">
+                {initials("Alex Morgan")}
+              </span>
+              <h3>Alex Morgan</h3>
+              <p>Independent designer & developer</p>
+              <p className="muted">Fictional persona · Local demo account</p>
+              <Button
+                onClick={() => {
+                  setPanel(null);
+                  setNewProject(true);
+                }}
+              >
+                Create a project
+              </Button>
+            </div>
+          ) : (
+            <div className="form-actions">
+              <Button variant="outline" onClick={() => setPanel(null)}>
+                Keep my changes
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  reset();
+                  setPanel(null);
+                }}
+              >
+                Reset demo data
+              </Button>
+            </div>
+          )}
+        </Dialog>
+      )}
+      {newProject && (
+        <EntityForm kind="project" onClose={() => setNewProject(false)} />
+      )}
+    </>
+  );
+}
+export function Workspace({ children }: { children: ReactNode }) {
+  return (
+    <Provider>
+      <Shell>{children}</Shell>
+    </Provider>
+  );
+}
