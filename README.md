@@ -2,6 +2,10 @@
 
 Demo original de gestión empresarial para un **proyecto personal de portafolio**, adecuada para presentar en Contra y Upwork. Todas las empresas, personas, actividades, cifras y resultados son ficticios. No representa un encargo comercial ni resultados reales de clientes.
 
+[Ver demo pública](https://flowboard-sooty-one.vercel.app/) · [Repositorio](https://github.com/AvelarLic96/flowboard)
+
+La demo está desplegada en Vercel. Los datos que modifiques se guardan únicamente en tu navegador.
+
 ## Ejecutar localmente
 
 Requisitos: Node.js 22.13 o superior (se recomienda una versión LTS vigente) y npm.
@@ -67,7 +71,7 @@ Accesibilidad: navegación semántica, salto al contenido, etiquetas de formular
 
 El workflow `.github/workflows/ci.yml` repite lint, build y pruebas E2E en cada push o pull request; en CI usa Chromium instalado por Playwright.
 
-También puedes ejecutar `npx vercel` desde esta carpeta después de iniciar sesión. El proyecto no requiere funcionalidades de pago. No se ha realizado ningún despliegue remoto ni se ha vinculado una cuenta Vercel.
+También puedes ejecutar `npx vercel` desde esta carpeta después de iniciar sesión. El proyecto no requiere funcionalidades de pago. El despliegue de producción está conectado a la rama `main`; los nuevos pushes generan una nueva compilación en Vercel.
 
 ## Presentarlo en tu portafolio
 
